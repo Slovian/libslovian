@@ -1,6 +1,6 @@
 # libslovian
 
-A compact, [Defold](https://defold.com/)-first Lua utility library of reusable gameplay systems and helpers. Extracted from real projects (including *RTGambit*) and designed to be **inherited and configured**, not edited in place.
+A combat [Defold](https://defold.com/) utility library of reusable gameplay systems and helpers.
 
 ## What's inside
 
