@@ -7,8 +7,20 @@
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
 -- Generic membership collection with versioning.
--- local Collection = require("libslovian.defold.fragment.collections.BaseCollection")
--- local myColl = Collection:new()
+--
+-- Real-world uses in void-vector:
+--   * Global spawn-point registry: markers register by go.get_id() with { tags = {...} };
+--     managers iterate the collection to pick a weighted random "player_spawn" point.
+--   * Squadron / movement / affiliation registries: every agent registers itself so
+--     gameplay systems can iterate all active squads, members, or faction groups.
+--
+-- Example:
+--   local Collection = require("libslovian.defold.fragment.collections.BaseCollection")
+--   local coll = Collection:new()
+--   coll:registerMember(go.get_id(), { hp = 100 })
+--   for id, props in coll:iterateMembers() do ... end
+--   coll:unregisterMember(go.get_id())
+--   if coll:getCurrentVersion() ~= lastVersion then ... end   -- detect changes
 
 local Class = require("libslovian.core.Class")
 

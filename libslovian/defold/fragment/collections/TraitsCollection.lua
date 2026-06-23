@@ -6,10 +6,22 @@
 --/_______  /|____/\____/ \_/ |__(____  /___|  /
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
--- local TraitsCollection = require("libslovian.defold.fragment.collections.TraitsCollection")
--- local collection = TraitsCollection:new()
+-- Trait-aware membership collection.
 --
--- Mirrors BaseCollection, plus fast trait-aware queries:
+-- Real-world uses in void-vector:
+--   * Tag every ship with traits like "fighter", "bomber", "fast", "cloaked";
+--     AI targeting / spawning systems query all bombers or all cloaked fighters.
+--   * Faction / affiliation filtering without maintaining many separate lists.
+--
+-- Example:
+--   local TraitsCollection = require("libslovian.defold.fragment.collections.TraitsCollection")
+--   local tc = TraitsCollection:new()
+--   tc:registerMember(ship_id, {"fighter", "fast"})
+--
+--   for id in tc:byTrait("fighter") do ... end
+--   for id in tc:matchAll({"fighter", "cloaked"}) do ... end
+--
+-- API:
 --   :registerMember(member, {"fighter","fast"})   -- strings or numeric ids
 --   :unregisterMember(member)
 --   :iterateMembers()                              -- pairs iterator

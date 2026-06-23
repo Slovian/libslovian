@@ -6,10 +6,12 @@
 --/_______  /|____/\____/ \_/ |__(____  /___|  /
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
+-- local DynamicModulesFragment = require("libslovian.defold.fragment.DynamicModulesFragment")
+-----------------------------------------------------------------------------------------
 -- Base fragment for managing a dynamic set of child fragments at runtime.
 -- Useful for modular equipment, temporary buffs, spawned modules, etc.
 --
--- local DynamicModulesFragment = require("libslovian.defold.fragment.DynamicModulesFragment")
+
 
 local Fragment = require("libslovian.defold.fragment.Fragment")
 
