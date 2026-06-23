@@ -34,6 +34,7 @@ A combat [Defold](https://defold.com/) utility library of reusable gameplay syst
 
 - [Fragment system](./libslovian/docs/fragments.md)
 - [FSM system](./libslovian/docs/fsm.md)
+- [RPG stats](./libslovian/docs/rpg.md)
 
 ## Installation
 
