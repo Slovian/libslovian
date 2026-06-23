@@ -166,6 +166,58 @@ for ship in tc:matchAll({"fighter", "cloaked"}) do ... end
 
 Use `libslovian.core.Traits` directly if you only need string↔id interning or bit signatures.
 
+## RPG stats in fragments
+
+The `libslovian.core.rpg` modules fit naturally into fragments:
+
+```lua
+local Fragment      = require("libslovian.defold.fragment.Fragment")
+local RPGStatsSheet = require("libslovian.core.rpg.RPGStatsSheet")
+local RPGCounters   = require("libslovian.core.rpg.RPGCounters")
+
+local DestructibleFragment = Fragment:extend()
+
+local CounterDefs = {
+    HP = { max_stat = "HP_max", regen_stat = "HP_regen", degen_stat = "HP_degen", initial_value = "max" },
+}
+
+function DestructibleFragment:init(context)
+    DestructibleFragment.super.init(self, context)
+
+    local def = context.definition
+    self.mStats = RPGStatsSheet:new(def.Stats)
+    self.mCounters = RPGCounters:new({ "HP" }, self.mStats, CounterDefs)
+
+    context.registerOnMessage()
+end
+
+function DestructibleFragment:on_message(message_id, message, sender)
+    if message_id == hash("damage") then
+        self.mCounters:subtract("HP", message.damage or 0)
+        if self.mCounters:get("HP") <= 0 then
+            go.delete()
+        end
+    end
+end
+```
+
+For ships/characters with multiple modifier sheets, use `RPGStatsBook`:
+
+```lua
+local RPGStatsBook = require("libslovian.core.rpg.RPGStatsBook")
+local RPGCounters  = require("libslovian.core.rpg.RPGCounters")
+
+-- In a modules-manager fragment:
+self.mShipStats = RPGStatsBook:new({ Base = context.definition.Stats })
+self.mCounters  = RPGCounters:new({ "HP", "Energy" }, self.mShipStats, MyCounterDefs)
+
+-- In a weapon module (DynamicFragment):
+self.mStats = RPGStatsBook:new(initData.Stats, context.modulesFragment:getShipStats())
+self.mCounters = RPGCounters:new({ "Ammo" }, self.mStats, MyCounterDefs)
+```
+
+`RPGStatsBook:addSheet("EngineBoost", sheet)` and `:removeSheet("EngineBoost")` let you apply and remove temporary modifiers at runtime.
+
 ## AI agent guidelines
 
 **When adding behavior to a game object:**

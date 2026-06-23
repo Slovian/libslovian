@@ -11,6 +11,7 @@ A combat [Defold](https://defold.com/) utility library of reusable gameplay syst
 - **StateModel** — observable game-meta state class with validators, dirty tracking, and pluggable serialization.
 - **Codec** / **TableCodec** — integrity-protected table serialization.
 - **Traits** — string↔id interner and bit-set signatures for trait tagging.
+- **RPG stats** — `RPGStatsSheet`, `RPGStatsBook`, `RPGCounters`, and example `RPGCounterDefinitions` for additive/multiplicative stats and resource counters.
 - **WeightedRandom** — one-pass weighted reservoir sampling.
 - **Utils** — math, random-seed, permutation, and class-check helpers.
 
