@@ -1,0 +1,414 @@
+-----------------------------------------------------------------------------------------
+--  _________.__              .__
+-- /   _____/|  |   _______  _|__|____    ____  ©2019
+-- \_____  \ |  |  /  _ \  \/ /  \__  \  /    \
+-- /        \|  |_(  <_> )   /|  |/ __ \|   |  \
+--/_______  /|____/\____/ \_/ |__(____  /___|  /
+--       \/                          \/     \/
+-----------------------------------------------------------------------------------------
+-- Generic streaming music manager for Defold.
+--
+-- Edit CONFIG below for your project, or copy this script to your project and
+-- customize it there. Each "preset" is a group of collection-proxy-backed
+-- tracks; the manager loads one preset, shuffles its tracks, and auto-advances.
+
+local ScriptFsm = require("libslovian.defold.fsm.ScriptFsm")
+
+local CONFIG = {
+	-- Master switch. Wire this to your Settings instance if you want runtime
+	-- toggling (e.g. via a "set_music_enabled" message).
+	play_music = true,
+
+	-- Preset used when the manager starts.
+	default_preset = "default",
+
+	-- Preset definitions. Each preset must have the same number of proxies and
+	-- tracks (one track URL per proxy).
+	presets = {
+		default = {
+			proxies = { "#music_default_1", "#music_default_2", "#music_default_3" },
+			tracks  = { "music_1:/music#music", "music_2:/music#music", "music_3:/music#music" },
+		},
+		reggae = {
+			proxies = { "#music_reggae_1", "#music_reggae_2", "#music_reggae_3" },
+			tracks  = { "music_1:/music#music", "music_2:/music#music", "music_3:/music#music" },
+		},
+		synth = {
+			proxies = { "#music_synth_1", "#music_synth_2", "#music_synth_3" },
+			tracks  = { "music_1:/music#music", "music_2:/music#music", "music_3:/music#music" },
+		},
+	},
+
+	-- Delay (seconds) before loading the remaining proxies after the first one.
+	other_songs_load_delay = 5.0,
+
+	-- Configure liveupdate readiness for this project.
+	-- By default the manager assumes liveupdate content is ready immediately.
+	liveupdate = {
+		is_ready = function() return true end,
+		listen   = function() end,
+	},
+}
+
+local MSG_MUSIC_PAUSE = hash("music_pause")
+local MSG_MUSIC_UNPAUSE = hash("music_unpause")
+local MSG_MUSIC_LOAD = hash("music_load")
+local MSG_ASYNC_LOAD = hash("async_load")
+local MSG_UNLOAD = hash("unload")
+local MSG_ENABLE = hash("enable")
+local MSG_PROXY_LOADED = hash("proxy_loaded")
+local MSG_PROXY_UNLOADED = hash("proxy_unloaded")
+local MSG_COSMETIC_APPLIED = hash("cosmetic_applied")
+local MSG_SETTINGS_UPDATED = hash("settings_updated")
+local MSG_LIVEUPDATE_CONTENT_READY = hash("liveupdate_content_ready")
+
+local STATE_IDLE = 0
+local STATE_LOADING = 1
+local STATE_READY = 2
+local STATE_UNLOADING = 3
+
+local FSM = ScriptFsm:defineFsm(STATE_IDLE)
+
+-----------------------------------------------------------------------------------------
+-- Helpers
+local function StopCurrentMusic(vars)
+	if vars.CurrentMusic then
+		sound.stop(vars.UrlMusicList[vars.CurrentMusic])
+		vars.CurrentMusic = nil
+	end
+end
+
+local function RequestLoad(vars, proxy)
+	if not proxy.IsLoading then
+		msg.post(proxy.Url, MSG_ASYNC_LOAD)
+		proxy.IsLoading = true
+	end
+end
+
+local function RequestLoaded(vars, proxy)
+	proxy.IsLoaded = true
+	table.insert(vars.UrlReadyProxies, proxy.Index)
+end
+
+local function RequestUnload(vars, proxy)
+	if not proxy.IsLoaded then
+		return
+	end
+
+	msg.post(proxy.Url, MSG_UNLOAD)
+	proxy.IsLoaded = false
+	proxy.IsUnloading = true
+
+	local index = proxy.Index
+	for i, proxyIndex in ipairs(vars.UrlReadyProxies) do
+		if proxyIndex == index then
+			table.remove(vars.UrlReadyProxies, i)
+			break
+		end
+	end
+end
+
+local function RequestUnloaded(vars, proxy)
+	proxy.IsLoading = false
+	proxy.IsLoaded = false
+	proxy.IsUnloading = false
+end
+
+local function PlayRandom(vars, previousMusicIndex)
+	local urlMusicList = vars.UrlReadyProxies
+	local musicCount = #urlMusicList
+	if musicCount == 0 then
+		return
+	end
+	local selectedMusicIndex
+
+	if previousMusicIndex and musicCount > 1 then
+		selectedMusicIndex = math.random(1, musicCount - 1)
+		if selectedMusicIndex >= previousMusicIndex then
+			selectedMusicIndex = selectedMusicIndex + 1
+		end
+	else
+		selectedMusicIndex = math.random(1, musicCount)
+	end
+
+	local selectedMusic = urlMusicList[selectedMusicIndex]
+	local funShuffle = function()
+		vars.CurrentMusic = nil
+		if CONFIG.play_music then
+			PlayRandom(vars, selectedMusicIndex)
+		end
+	end
+
+	vars.CurrentMusic = selectedMusic
+	if not vars.Pause then
+		sound.play(vars.UrlMusicList[selectedMusic], nil, funShuffle)
+	end
+end
+
+local function Pause(vars, pause)
+	if pause == vars.Pause then
+		return
+	end
+	vars.Pause = pause
+	if vars.CurrentMusic then
+		sound.pause(vars.UrlMusicList[vars.CurrentMusic], pause)
+	else
+		PlayRandom(vars)
+	end
+end
+
+-----------------------------------------------------------------------------------------
+-- Initializer
+local initializer = function(vars, owner, context)
+	vars.Presets = {}
+	vars.UrlReadyProxies = {}
+	vars.UrlMusicList = {}
+	vars.Pause = false
+
+	for presetName, preset in pairs(CONFIG.presets) do
+		local proxies = {}
+		local tracks = {}
+
+		for i, adr in ipairs(preset.proxies) do
+			proxies[i] = {
+				Url = msg.url(adr),
+				IsLoaded = false,
+				IsLoading = false,
+				IsUnloading = false,
+				Index = i,
+			}
+		end
+
+		for i, adr in ipairs(preset.tracks) do
+			tracks[i] = msg.url(adr)
+		end
+
+		vars.Presets[presetName] = {
+			proxies = proxies,
+			tracks = tracks,
+		}
+	end
+end
+
+local finalizer = function(vars)
+
+end
+
+FSM:addInitializer(initializer, finalizer)
+
+-----------------------------------------------------------------------------------------
+-- stateIdle
+local stateIdle = FSM:addState(STATE_IDLE)
+
+stateIdle.activate = function(vars, script, prevState)
+	vars.MusicLoadRequest = false
+	local isLiveupdateContentReady = CONFIG.liveupdate.is_ready()
+	vars.MusicContentReady = isLiveupdateContentReady
+	if not isLiveupdateContentReady then
+		CONFIG.liveupdate.listen()
+	end
+end
+
+stateIdle.on_message = function(vars, script, message_id, message, sender)
+	if message_id == MSG_MUSIC_LOAD then
+		vars.MusicLoadRequest = true
+	elseif message_id == MSG_LIVEUPDATE_CONTENT_READY then
+		vars.MusicContentReady = true
+	end
+
+	if vars.MusicLoadRequest and vars.MusicContentReady then
+		return STATE_LOADING
+	end
+end
+
+-----------------------------------------------------------------------------------------
+-- stateLoading
+local stateLoading = FSM:addState(STATE_LOADING)
+
+stateLoading.activate = function(vars, script, prevState)
+	local activePreset = CONFIG.default_preset or "default"
+	local preset = vars.Presets[activePreset]
+
+	if not preset then
+		-- Fallback to the first available preset.
+		for name, p in pairs(vars.Presets) do
+			activePreset = name
+			preset = p
+			break
+		end
+	end
+
+	vars.ActivePreset = activePreset
+	vars.Proxies = preset.proxies
+	vars.UrlMusicList = preset.tracks
+	vars.FirstProxyLoading = true
+
+	local firstMusicIndex = math.random(1, #vars.Proxies)
+	RequestLoad(vars, vars.Proxies[firstMusicIndex])
+end
+
+stateLoading.on_message = function(vars, script, message_id, message, sender)
+	if message_id == MSG_PROXY_LOADED then
+		msg.post(sender, MSG_ENABLE)
+
+		local function loadAllProxies()
+			for _, proxy in pairs(vars.Proxies) do
+				if not proxy.IsLoaded then
+					RequestLoad(vars, proxy)
+				end
+			end
+		end
+
+		for _, proxy in pairs(vars.Proxies) do
+			if proxy.Url == sender then
+				RequestLoaded(vars, proxy)
+				if vars.FirstProxyLoading then
+					vars.FirstProxyLoading = false
+					timer.delay(CONFIG.other_songs_load_delay, false, loadAllProxies)
+				end
+				break
+			end
+		end
+
+		if vars.CurrentMusic == nil and CONFIG.play_music then
+			PlayRandom(vars)
+		end
+
+		local allProxiesLoaded = true
+		for _, proxy in pairs(vars.Proxies) do
+			if not proxy.IsLoaded then
+				allProxiesLoaded = false
+				break
+			end
+		end
+		if allProxiesLoaded then
+			return STATE_READY
+		end
+	elseif message_id == MSG_COSMETIC_APPLIED then
+		return STATE_UNLOADING
+	elseif message_id == MSG_MUSIC_PAUSE then
+		Pause(vars, true)
+	elseif message_id == MSG_MUSIC_UNPAUSE then
+		Pause(vars, false)
+	end
+end
+
+stateLoading.on_internal_message = function(vars, object, internal_id, message)
+	if internal_id == MSG_SETTINGS_UPDATED then
+		if CONFIG.play_music then
+			PlayRandom(vars)
+		else
+			if vars.CurrentMusic then
+				sound.stop(vars.UrlMusicList[vars.CurrentMusic])
+			end
+			vars.CurrentMusic = nil
+		end
+	end
+end
+
+----------------------------------------------------------------------------------------
+-- stateReady
+local stateReady = FSM:addState(STATE_READY)
+
+stateReady.on_message = function(vars, script, message_id, message, sender)
+	if message_id == MSG_COSMETIC_APPLIED then
+		return STATE_UNLOADING
+	elseif message_id == MSG_MUSIC_PAUSE then
+		Pause(vars, true)
+	elseif message_id == MSG_MUSIC_UNPAUSE then
+		Pause(vars, false)
+	end
+end
+
+stateReady.on_internal_message = function(vars, object, internal_id, message)
+	if internal_id == MSG_SETTINGS_UPDATED then
+		if CONFIG.play_music then
+			PlayRandom(vars)
+		else
+			if vars.CurrentMusic then
+				sound.stop(vars.UrlMusicList[vars.CurrentMusic])
+			end
+			vars.CurrentMusic = nil
+		end
+	end
+end
+
+----------------------------------------------------------------------------------------
+-- stateUnloading
+local stateUnloading = FSM:addState(STATE_UNLOADING)
+
+stateUnloading.activate = function(vars, script, prevState)
+	StopCurrentMusic(vars)
+
+	for _, proxy in pairs(vars.Proxies) do
+		RequestUnload(vars, proxy)
+	end
+
+	local allUnloaded = true
+	for _, proxy in pairs(vars.Proxies) do
+		if proxy.IsLoaded or proxy.IsUnloading or proxy.IsLoading then
+			allUnloaded = false
+			break
+		end
+	end
+
+	if allUnloaded then
+		return STATE_LOADING
+	end
+end
+
+stateUnloading.on_message = function(vars, script, message_id, message, sender)
+	if message_id == MSG_PROXY_LOADED then
+		for _, proxy in pairs(vars.Proxies) do
+			if proxy.Url == sender then
+				RequestLoaded(vars, proxy)
+				RequestUnload(vars, proxy)
+				break
+			end
+		end
+	elseif message_id == MSG_PROXY_UNLOADED then
+		for _, proxy in pairs(vars.Proxies) do
+			if proxy.Url == sender then
+				RequestUnloaded(vars, proxy)
+				break
+			end
+		end
+
+		local allUnloaded = true
+		for _, proxy in pairs(vars.Proxies) do
+			if proxy.IsLoaded or proxy.IsUnloading or proxy.IsLoading then
+				allUnloaded = false
+				break
+			end
+		end
+
+		if allUnloaded then
+			return STATE_LOADING
+		end
+	end
+end
+
+----------------------------------------------------------------------------------------
+
+function init(self)
+	self.mFsm = FSM:new(self)
+
+	-- TODO: wire this to your Settings instance if you want runtime toggling.
+	-- local unsubscribe = SettingsInstance:on("play_music", function(new, old)
+	--     self.mFsm:on_internal_message(MSG_SETTINGS_UPDATED)
+	-- end)
+
+	self.mFsm:init()
+end
+
+function final(self)
+	self.mFsm:final()
+end
+
+function update(self, dt)
+	self.mFsm:update(dt)
+end
+
+function on_message(self, message_id, message, sender)
+	self.mFsm:on_message(message_id, message, sender)
+end

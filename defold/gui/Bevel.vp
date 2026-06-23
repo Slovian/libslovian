@@ -1,0 +1,11 @@
+// Bevel.vp
+attribute mediump vec4 position;
+attribute mediump vec2 texcoord0;    // 0–1 over the quad
+varying   mediump vec2 v_uv;
+
+uniform mediump mat4 view_proj;
+
+void main() {
+	v_uv = texcoord0;
+	gl_Position = view_proj * position;
+}

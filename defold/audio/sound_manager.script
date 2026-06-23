@@ -1,0 +1,114 @@
+-----------------------------------------------------------------------------------------
+--  _________.__              .__
+-- /   _____/|  |   _______  _|__|____    ____  ©2025
+-- \_____  \ |  |  /  _ \  \/ /  \__  \  /    \
+-- /        \|  |_(  <_> )   /|  |/ __ \|   |  \
+--/_______  /|____/\____/ \_/ |__(____  /___|  /
+--       \/                          \/     \/
+-----------------------------------------------------------------------------------------
+-- Generic pooled one-shot SFX manager.
+--
+-- Edit CONFIG below for your project, or copy this script to your project and
+-- customize it there. Collections are played through an availability pool so
+-- the same sample does not overlap until it finishes; singles are played raw.
+
+local CONFIG = {
+	-- Master switch. Wire this to your Settings instance if you want runtime
+	-- toggling (e.g. via a "set_sound_enabled" message).
+	play_sound = true,
+
+	-- message_id -> { url, url, ... }  (random pool)
+	collections = {
+		[hash("sound_click")]  = { "#click_00", "#click_01", "#click_02", "#click_03", "#click_04", "#click_05" },
+		[hash("sound_move")]   = { "#move_00", "#move_01", "#move_02", "#move_03", "#move_04", "#move_05", "#move_06", "#move_07", "#move_08", "#move_09", "#move_10" },
+		[hash("sound_hit")]    = { "#hit_00", "#hit_01", "#hit_02", "#hit_03" },
+		[hash("sound_coin")]   = { "#coin_00", "#coin_01", "#coin_02", "#coin_03", "#coin_04" },
+		[hash("sound_open")]   = { "#open_00", "#open_01", "#open_02" },
+		[hash("sound_locked")] = { "#locked_00", "#locked_01", "#locked_02", "#locked_03" },
+	},
+
+	-- message_id -> single url
+	singles = {
+		[hash("sound_begin_game")] = "#begin_game",
+		[hash("sound_countdown")]  = "#countdown_00",
+	},
+}
+
+local function playRandomSound(soundCollection)
+	if not CONFIG.play_sound then
+		return
+	end
+
+	local availableSounds = soundCollection.AvailableSounds
+	if availableSounds < 1 then
+		return
+	end
+
+	local soundToPick = math.random(availableSounds)
+	for i, isAvailable in ipairs(soundCollection.AvailableArray) do
+		if isAvailable then
+			if soundToPick <= 1 then
+				soundCollection.AvailableArray[i] = false
+				soundCollection.AvailableSounds = availableSounds - 1
+				local function unmark()
+					soundCollection.AvailableArray[i] = true
+					soundCollection.AvailableSounds = soundCollection.AvailableSounds + 1
+				end
+				sound.play(soundCollection.AdressArray[i], {}, unmark)
+				return
+			end
+			soundToPick = soundToPick - 1
+		end
+	end
+end
+
+local function prepareSoundCollection(soundList)
+	local availableArray = {}
+	local adressArray = {}
+	local numberOfSounds = 0
+
+	for _, sound in ipairs(soundList) do
+		table.insert(availableArray, true)
+		table.insert(adressArray, msg.url(sound))
+		numberOfSounds = numberOfSounds + 1
+	end
+
+	return {
+		NumberOfSounds = numberOfSounds,
+		AvailableSounds = numberOfSounds,
+		AvailableArray = availableArray,
+		AdressArray = adressArray,
+	}
+end
+
+local function playSound(url)
+	if not CONFIG.play_sound then
+		return
+	end
+	sound.play(url)
+end
+
+function init(self)
+	self.mCollections = {}
+	for message_id, urls in pairs(CONFIG.collections) do
+		self.mCollections[message_id] = prepareSoundCollection(urls)
+	end
+
+	self.mSingles = {}
+	for message_id, url in pairs(CONFIG.singles) do
+		self.mSingles[message_id] = msg.url(url)
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	local collection = self.mCollections[message_id]
+	if collection then
+		playRandomSound(collection)
+		return
+	end
+
+	local single = self.mSingles[message_id]
+	if single then
+		playSound(single)
+	end
+end
