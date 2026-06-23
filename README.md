@@ -16,7 +16,7 @@ A combat [Defold](https://defold.com/) utility library of reusable gameplay syst
 
 ### Defold
 
-- **Fragment system** — split game-object scripts into composable fragments with dependency-ordered callbacks. Includes `Fragment`, `FragmentsCollection`, `FsmFragment`, `DynamicFragment`, `DynamicModulesFragment`, plus `baseCollection` and `TraitsCollection` for managing groups of objects/traits.
+- **Fragment system** — split game-object scripts into composable fragments with dependency-ordered callbacks. Includes `Fragment`, `FragmentsCollection`, `FsmFragment`, `DynamicFragment`, `DynamicModulesFragment`, plus `BaseCollection` and `TraitsCollection` for managing groups of objects/traits.
 - **FSMs** — `ScriptFsm`, `FsmFragment`, and `GuiFsm` for state-machine-driven logic in scripts, fragments, and GUI scripts.
 - **GUI helpers** — `Bevel` (beveled panel shader helper), `Parallax`.
 - **Camera** — `CameraUtilz` screen-to-world helpers.

@@ -9,7 +9,7 @@
 -- local TraitsCollection = require("libslovian.defold.fragment.collections.TraitsCollection")
 -- local collection = TraitsCollection:new()
 --
--- Mirrors baseCollection, plus fast trait-aware queries:
+-- Mirrors BaseCollection, plus fast trait-aware queries:
 --   :registerMember(member, {"fighter","fast"})   -- strings or numeric ids
 --   :unregisterMember(member)
 --   :iterateMembers()                              -- pairs iterator

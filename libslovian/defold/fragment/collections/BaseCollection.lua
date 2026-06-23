@@ -7,7 +7,7 @@
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
 -- Generic membership collection with versioning.
--- local Collection = require("libslovian.defold.fragment.collections.baseCollection")
+-- local Collection = require("libslovian.defold.fragment.collections.BaseCollection")
 -- local myColl = Collection:new()
 
 local Class = require("libslovian.core.Class")

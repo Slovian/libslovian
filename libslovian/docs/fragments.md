@@ -9,7 +9,7 @@ Composable component system for Defold game objects. A game object's `.script` b
 - `libslovian.defold.fragment.FsmFragment` — adapter for FSM-based fragments
 - `libslovian.defold.fragment.DynamicFragment` — fragments added/removed at runtime
 - `libslovian.defold.fragment.DynamicModulesFragment` — host fragment that owns dynamic children
-- `libslovian.defold.fragment.collections.baseCollection` — generic membership collection
+- `libslovian.defold.fragment.collections.BaseCollection` — generic membership collection
 - `libslovian.defold.fragment.collections.TraitsCollection` — trait-aware membership collection
 
 ## Concept
@@ -144,10 +144,10 @@ The host handles `update`, `on_message`, `on_internal_message`, `on_input`, and 
 
 ## Collections
 
-`baseCollection` is a generic membership registry with versioning:
+`BaseCollection` is a generic membership registry with versioning:
 
 ```lua
-local Collection = require("libslovian.defold.fragment.collections.baseCollection")
+local Collection = require("libslovian.defold.fragment.collections.BaseCollection")
 local coll = Collection:new()
 coll:registerMember(member, properties)
 coll:unregisterMember(member)
