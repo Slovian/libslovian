@@ -30,6 +30,11 @@ A combat [Defold](https://defold.com/) utility library of reusable gameplay syst
 - Defold scripts are named `lowercase_with_underscores`.
 - Project-specific values (app name, save file, sound URLs, codec secrets, validators) are always supplied by the game project, never hardcoded in the library.
 
+## Documentation
+
+- [Fragment system](./libslovian/docs/fragments.md)
+- [FSM system](./libslovian/docs/fsm.md)
+
 ## Installation
 
 ### As a Defold library dependency
