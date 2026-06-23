@@ -7,7 +7,7 @@
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
 -- local ContentManager = require("libslovian.defold.liveupdate.ContentManager")
------------------------------------------------------------------------------------------
+--
 -- Generic Defold LiveUpdate content manager.
 --
 -- Usage from a script's init():

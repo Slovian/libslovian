@@ -7,7 +7,8 @@
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
 -- local GuiFsm = require("libslovian.defold.fsm.GuiFsm")
--- GUI-focused FSM with Class.lua; handlers receive STATE as `self`.
+--
+-- GUI-focused FSM; handlers receive STATE as `self`.
 -- Requires: local Class = require("libslovian.core.Class")
 
 local Class = require("libslovian.core.Class")

@@ -6,8 +6,9 @@
 --/_______  /|____/\____/ \_/ |__(____  /___|  /
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
--- common base fragment class
 -- local Fragment = require("libslovian.defold.fragment.Fragment")
+--
+-- Common base fragment class.
 
 local Class = require("libslovian.core.Class")
 

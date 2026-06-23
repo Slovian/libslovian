@@ -7,6 +7,7 @@
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
 -- local TableCodec = require("libslovian.core.TableCodec")
+--
 -- Serialize/deserialize Lua tables with optional obfuscating string codec.
 -- Defold/LuaJIT 5.1 friendly (no deps).
 

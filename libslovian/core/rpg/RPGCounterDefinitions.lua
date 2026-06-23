@@ -6,6 +6,8 @@
 --/_______  /|____/\____/ \_/ |__(____  /___|  /
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
+-- local RPGCounterDefinitions = require("libslovian.core.rpg.RPGCounterDefinitions")
+--
 -- EXAMPLE counter definitions for use with RPGCounters.
 --
 -- Copy this file into your own project and edit it, or pass a similar table

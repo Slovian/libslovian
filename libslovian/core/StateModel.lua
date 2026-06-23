@@ -7,7 +7,7 @@
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
 -- local StateModel = require("libslovian.core.StateModel")
------------------------------------------------------------------------------------------
+--
 -- Base observable game-meta state class.
 --
 -- Similar to Settings, but intended for progression/state rather than user

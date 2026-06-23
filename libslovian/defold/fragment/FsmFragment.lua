@@ -6,8 +6,9 @@
 --/_______  /|____/\____/ \_/ |__(____  /___|  /
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
--- General implementation of FSM based fragment, that receives FSM object and can do whatever we want with it
 -- local FsmFragment = require("libslovian.defold.fragment.FsmFragment")
+--
+-- General FSM-based fragment that receives an FSM object and forwards callbacks to it.
 
 local Fragment = require("libslovian.defold.fragment.Fragment")
 

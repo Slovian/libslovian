@@ -6,9 +6,9 @@
 --/_______  /|____/\____/ \_/ |__(____  /___|  /
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
-
--- Global const module. To include simply do:
 -- local ScriptFsm = require("libslovian.defold.fsm.ScriptFsm")
+--
+-- Script-based finite state machine.
 
 local ScriptFsm = {}
 

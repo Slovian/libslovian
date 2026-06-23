@@ -6,8 +6,9 @@
 --/_______  /|____/\____/ \_/ |__(____  /___|  /
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
--- collection of all fragments in the game object
 -- local FragmentsCollection = require("libslovian.defold.fragment.FragmentsCollection")
+--
+-- Collection of all fragments in the game object.
 
 local MSG_POST_INIT = hash("post_init")
 

@@ -6,9 +6,9 @@
 --/_______  /|____/\____/ \_/ |__(____  /___|  /
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
-
--- Common utilities module. To include simply do:
 -- local Utils = require("libslovian.core.Utils")
+--
+-- Common utilities module.
 
 local Utils = {}
 

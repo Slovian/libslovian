@@ -6,9 +6,10 @@
 --/_______  /|____/\____/ \_/ |__(____  /___|  /
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
+-- local Traits = require("libslovian.core.Traits")
+--
 -- Trait utilities: string↔id interner and bit-set signature builder.
 --
--- local Traits = require("libslovian.core.Traits")
 -- local id  = Traits("bomber")
 -- local ids = Traits.ids("fighter", "fast")
 -- local sig = Traits.sig("fighter", "fast", "cloaked")

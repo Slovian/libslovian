@@ -7,7 +7,7 @@
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
 -- local Settings = require("libslovian.core.Settings")
------------------------------------------------------------------------------------------
+--
 -- Base observable settings class.
 --
 -- Inherit and provide your game-specific defaults, app name and save file:

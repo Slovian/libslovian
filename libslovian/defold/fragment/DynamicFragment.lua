@@ -6,10 +6,10 @@
 --/_______  /|____/\____/ \_/ |__(____  /___|  /
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
+-- local DynamicFragment = require("libslovian.defold.fragment.DynamicFragment")
+--
 -- Base class for fragments that can be added and removed during an object's lifetime.
 -- Typically managed by a DynamicModulesFragment.
---
--- local DynamicFragment = require("libslovian.defold.fragment.DynamicFragment")
 
 local Fragment = require("libslovian.defold.fragment.Fragment")
 

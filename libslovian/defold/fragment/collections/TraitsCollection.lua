@@ -6,6 +6,8 @@
 --/_______  /|____/\____/ \_/ |__(____  /___|  /
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
+-- local TraitsCollection = require("libslovian.defold.fragment.collections.TraitsCollection")
+--
 -- Trait-aware membership collection.
 --
 -- Real-world uses in void-vector:
@@ -14,7 +16,6 @@
 --   * Faction / affiliation filtering without maintaining many separate lists.
 --
 -- Example:
---   local TraitsCollection = require("libslovian.defold.fragment.collections.TraitsCollection")
 --   local tc = TraitsCollection:new()
 --   tc:registerMember(ship_id, {"fighter", "fast"})
 --

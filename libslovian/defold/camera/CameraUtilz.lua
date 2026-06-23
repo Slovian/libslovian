@@ -7,6 +7,8 @@
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
 -- local CameraUtilz = require("libslovian.defold.camera.CameraUtilz")
+--
+-- Minimal screen-to-world helper.
 
 local CameraUtilz = {} 
 

@@ -6,6 +6,8 @@
 --/_______  /|____/\____/ \_/ |__(____  /___|  /
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
+-- local Collection = require("libslovian.defold.fragment.collections.BaseCollection")
+--
 -- Generic membership collection with versioning.
 --
 -- Real-world uses in void-vector:
@@ -15,7 +17,6 @@
 --     gameplay systems can iterate all active squads, members, or faction groups.
 --
 -- Example:
---   local Collection = require("libslovian.defold.fragment.collections.BaseCollection")
 --   local coll = Collection:new()
 --   coll:registerMember(go.get_id(), { hp = 100 })
 --   for id, props in coll:iterateMembers() do ... end

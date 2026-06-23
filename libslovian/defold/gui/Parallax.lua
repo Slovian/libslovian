@@ -7,6 +7,8 @@
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
 -- local Parallax = require("libslovian.defold.gui.Parallax")
+--
+-- Parallax scrolling helper for GUI nodes.
 
 local Parallax = {}
 

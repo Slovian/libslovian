@@ -6,9 +6,9 @@
 --/_______  /|____/\____/ \_/ |__(____  /___|  /
 --       \/                          \/     \/
 -----------------------------------------------------------------------------------------
-
--- Base polimorphism module. To include simply do:
 -- local Class = require("libslovian.core.Class")
+--
+-- Base polimorphism module.
 
 local Class = {}
 
