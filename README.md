@@ -10,7 +10,6 @@ A compact, [Defold](https://defold.com/)-first Lua utility library of reusable g
 - **Settings** — observable user-preferences class with save/load.
 - **StateModel** — observable game-meta state class with validators, dirty tracking, and pluggable serialization.
 - **Codec** / **TableCodec** — integrity-protected table serialization.
-- **BehaviorTree** — hierarchical resolver for grid/tactical behavior trees.
 - **WeightedRandom** — one-pass weighted reservoir sampling.
 - **Utils** — math, random-seed, permutation, and class-check helpers.
 
