@@ -31,7 +31,18 @@ A compact, [Defold](https://defold.com/)-first Lua utility library of reusable g
 
 ## Installation
 
-Add this repository as a dependency in your Defold project, or clone it into a `libslovian/` folder next to your own source.
+### As a Defold library dependency
+
+Add the release ZIP URL to your `game.project` under `[project] dependencies`:
+
+```ini
+[project]
+dependencies = https://github.com/Slovian/libslovian/releases/download/v0.1.0/libslovian.zip
+```
+
+The library code lives under the `libslovian/` folder, so require paths stay the same as when it is cloned locally.
+
+### As a local clone
 
 ```bash
 git clone https://github.com/Slovian/libslovian.git libslovian
