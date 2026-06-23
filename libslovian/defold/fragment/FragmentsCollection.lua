@@ -9,9 +9,6 @@
 -- collection of all fragments in the game object
 -- local FragmentsCollection = require("libslovian.defold.fragment.FragmentsCollection")
 
--- TODO: generalize if you need spawn-properties injection.
---local SpawnProperties = require("...")
-
 local MSG_POST_INIT = hash("post_init")
 
 local FragmentsCollection = {}
@@ -119,7 +116,11 @@ end
 
 -----------------------------------------------------------------------------------------
 -- Initialize all fragments and compute the ordered callback lists.
-function FragmentsCollection:init(definition)
+-- @param definition   Table passed to each fragment as context.definition.
+-- @param options      Optional table. Supported keys:
+--                     spawnProperties - table (or function returning a table)
+--                                       made available as context.spawnProperties.
+function FragmentsCollection:init(definition, options)
 	local fragmentsList = self.mFragments
 	local updatesList = self.mUpdates
 	local messagesList = self.mMessages
@@ -128,6 +129,12 @@ function FragmentsCollection:init(definition)
 	local processedFragment
 	local processedFragmentIndex
 	local context
+
+	options = options or {}
+	local spawnProperties = options.spawnProperties
+	if type(spawnProperties) == "function" then
+		spawnProperties = spawnProperties()
+	end
 
 	-- Function to retrieve a dependency fragment given its class.
 	local funGetDependency = function(fragmentClass)
@@ -202,7 +209,7 @@ function FragmentsCollection:init(definition)
 		registerOnInternalMsg = funRegisterInternalMessage,
 		registerOnInput = funRegisterOnInput,
 		registerPostInit = RegisterPostInit,
-		--spawnProperties = SpawnProperties:get(),
+		spawnProperties = spawnProperties,
 	}
 
 	-- Initialize each fragment with the shared context.

@@ -7,6 +7,10 @@ Composable component system for Defold game objects. A game object's `.script` b
 - `libslovian.defold.fragment.Fragment` — base class
 - `libslovian.defold.fragment.FragmentsCollection` — composition manager
 - `libslovian.defold.fragment.FsmFragment` — adapter for FSM-based fragments
+- `libslovian.defold.fragment.DynamicFragment` — fragments added/removed at runtime
+- `libslovian.defold.fragment.DynamicModulesFragment` — host fragment that owns dynamic children
+- `libslovian.defold.fragment.collections.baseCollection` — generic membership collection
+- `libslovian.defold.fragment.collections.TraitsCollection` — trait-aware membership collection
 
 ## Concept
 
@@ -24,7 +28,10 @@ function init(self)
     local fragments = FragmentsCollection:new(self)
     fragments:addFragment(SomeFragment:new(self))
     self.mFragments = fragments
-    fragments:init({ ... }) -- definition table passed to each fragment
+    fragments:init(
+        { ... },                       -- definition table passed to each fragment
+        { spawnProperties = { ... } }  -- optional, available as context.spawnProperties
+    )
 end
 
 function final(self)        self.mFragments:final() end
@@ -80,6 +87,7 @@ return MyFragment
 | `context.registerOnInternalMsg()` | Adds this fragment to the ordered `on_internal_message` callback list. |
 | `context.registerOnInput()` | Adds this fragment to the ordered `on_input` callback list. |
 | `context.registerPostInit()` | Triggers `hash("post_init")` to be sent to `#script` after all fragments init. |
+| `context.spawnProperties` | Optional properties table passed in `FragmentsCollection:init` options. |
 
 ## Blackboard conventions
 
@@ -113,6 +121,50 @@ fragments:addFragment(FsmFragment:new(self, MyFsm))
 ```
 
 The FSM receives the same `context` in `fsm:init(context)`.
+
+## Dynamic fragments
+
+`DynamicFragment` is a `Fragment` subclass meant for fragments created and destroyed after the owner is initialized. It accepts the same `init(context, definition)` signature.
+
+`DynamicModulesFragment` hosts a list of dynamic children, routing engine callbacks to them:
+
+```lua
+local DynamicModulesFragment = require("libslovian.defold.fragment.DynamicModulesFragment")
+local MyDynamicModule = require("...")
+
+local modules = DynamicModulesFragment:new(self)
+fragments:addFragment(modules)
+
+-- later
+modules:addDynamicFragment(MyDynamicModule:new(self), dynamicContext)
+modules:removeDynamicFragment(someModule)
+```
+
+The host handles `update`, `on_message`, `on_internal_message`, `on_input`, and `final` for all active children.
+
+## Collections
+
+`baseCollection` is a generic membership registry with versioning:
+
+```lua
+local Collection = require("libslovian.defold.fragment.collections.baseCollection")
+local coll = Collection:new()
+coll:registerMember(member, properties)
+coll:unregisterMember(member)
+```
+
+`TraitsCollection` extends that with fast trait queries:
+
+```lua
+local TraitsCollection = require("libslovian.defold.fragment.collections.TraitsCollection")
+local tc = TraitsCollection:new()
+tc:registerMember(ship, {"fighter", "fast"})
+
+for ship in tc:byTrait("fighter") do ... end
+for ship in tc:matchAll({"fighter", "cloaked"}) do ... end
+```
+
+Use `libslovian.core.Traits` directly if you only need string↔id interning or bit signatures.
 
 ## AI agent guidelines
 

@@ -10,12 +10,13 @@ A combat [Defold](https://defold.com/) utility library of reusable gameplay syst
 - **Settings** — observable user-preferences class with save/load.
 - **StateModel** — observable game-meta state class with validators, dirty tracking, and pluggable serialization.
 - **Codec** / **TableCodec** — integrity-protected table serialization.
+- **Traits** — string↔id interner and bit-set signatures for trait tagging.
 - **WeightedRandom** — one-pass weighted reservoir sampling.
 - **Utils** — math, random-seed, permutation, and class-check helpers.
 
 ### Defold
 
-- **Fragment system** (`Fragment`, `FragmentsCollection`) — split game-object scripts into composable fragments with dependency-ordered callbacks.
+- **Fragment system** — split game-object scripts into composable fragments with dependency-ordered callbacks. Includes `Fragment`, `FragmentsCollection`, `FsmFragment`, `DynamicFragment`, `DynamicModulesFragment`, plus `baseCollection` and `TraitsCollection` for managing groups of objects/traits.
 - **FSMs** — `ScriptFsm`, `FsmFragment`, and `GuiFsm` for state-machine-driven logic in scripts, fragments, and GUI scripts.
 - **GUI helpers** — `Bevel` (beveled panel shader helper), `Parallax`.
 - **Camera** — `CameraUtilz` screen-to-world helpers.
