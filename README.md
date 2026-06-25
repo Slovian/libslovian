@@ -44,7 +44,7 @@ Add the release ZIP URL to your `game.project` under `[project] dependencies`:
 
 ```ini
 [project]
-dependencies = https://github.com/Slovian/libslovian/releases/download/v0.1.0/libslovian.zip
+dependencies = https://github.com/Slovian/libslovian/releases/download/v0.1.1/libslovian.zip
 ```
 
 The library code lives under the `libslovian/` folder, so require paths stay the same as when it is cloned locally.

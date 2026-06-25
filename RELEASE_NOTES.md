@@ -1,5 +1,9 @@
 # Release Notes
 
+## v0.1.1
+
+Fixed Defold library packaging: added `[library] include_dirs = libslovian` to `game.project` so the library is correctly exposed when included as a remote dependency.
+
 ## v0.1.0
 
 Initial release of libslovian.
