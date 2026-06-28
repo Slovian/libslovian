@@ -1,6 +1,6 @@
 # libslovian
 
-A combat [Defold](https://defold.com/) utility library of reusable gameplay systems and helpers.
+[Defold](https://defold.com/) utility library of reusable gameplay systems and helpers.
 
 ## What's inside
 
